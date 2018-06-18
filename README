@@ -1,0 +1,3 @@
+tablify.py
+
+A simple class that allows users to store a formatted text table in memory and print it
