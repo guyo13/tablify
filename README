@@ -1,3 +1,4 @@
 tablify.py
 
-A simple class that allows users to store a formatted text table in memory and print it
+A simple class that allows users to store a formatted text table in memory and print it.
+In its core it is wrapping the python String format() method to create the string template
