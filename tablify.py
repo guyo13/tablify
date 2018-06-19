@@ -105,6 +105,7 @@ class Table(object):
         self.gen_row_spacer()
 
     def writeline(self, line):
+        """ Write a line to the table. it can be a comma delimited string or an iterable containing values which can be converted to strings """
         if line == None:
             return
         ltype = type(line)
@@ -125,9 +126,11 @@ class Table(object):
                 
     
     def getlines(self):
+        """" Returns the lines in the table as a list of comma delimited strings"""
         return self.__lines
  
     def gen_row_template_string(self, add_newline=True):
+        """" Generates and saves the string which is used with .format() to create the table rows """  
         addnl = ""
         if add_newline:
             addnl = "\n"
@@ -145,6 +148,7 @@ class Table(object):
         return template
             
     def gen_row_spacer(self):
+        """" Generates and saves the string which is printed between lines """  
         line = ""
         for elem in self.header:
             width =  elem.get("width")
@@ -158,6 +162,7 @@ class Table(object):
         return line
     
     def stringify(self):
+        """" Creates a string representation of the table """  
         if self.__row_template == None:
             self.gen_row_template_string()
         if self.__row_spacer == None:
@@ -180,19 +185,24 @@ class Table(object):
         return output
 
     def _get_header_prop(self, index, prop):
+        """ Get a property 'prop' from the header element in position 'index' """
         if index > len(self._header) or index < 0:
             raise IndexError("Invalid index for get header props")
         prop = self._header[index].get(prop, self.formatter.get(prop))
         return prop
             
     def _set_header_prop(self, index, prop, value):
+        """ Set a property 'prop' in the header element in position 'index' to value 'value' """
         if index > len(self._header) or index < 0:
             raise IndexError("Invalid index for set header props")
         if prop not in HEADER_PROPS:
             raise ValueError("Invalid header property '{}'.".format(prop))
         self._header[index][prop] = value
+        self.gen_row_template_string()
+        self.gen_row_spacer()
     
     def _get_multiple_header_prop(self, index, props):
+        """ Get the properties in 'props' from the header element in position 'index' """
         if index > len(self._header) or index < 0:
             raise IndexError("Invalid index for get header props")
         res = {}
@@ -204,6 +214,7 @@ class Table(object):
         return res
     
     def _truncate(self, word, length):
+        """ Shorten string 'word' to length 'length' """
         if len(word) > length:
             word = word[0:length]
         return word
