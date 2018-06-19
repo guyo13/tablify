@@ -5,11 +5,12 @@ if PY_VER[0] == "2":
 else:
     STR_TYPES = (str,)
 
-ITERABLES = (list, tuple, set)
+ITERABLES = (list, tuple)
 HEADER_TYPES = ITERABLES + STR_TYPES
 LINE_TYPES = HEADER_TYPES
 HEADER_PROPS = ("width", "text_dir", "row_delimiter", "left_delimiter", "right_delimiter", "auto_resize", "truncate")
- 
+VERSION = "0.1"
+
 class Formatter(object):
     def __init__(self, width=10,
                  text_dir="ltr",
