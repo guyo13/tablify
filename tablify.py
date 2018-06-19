@@ -178,8 +178,6 @@ class Table(object):
                 props = self._get_multiple_header_prop(j, ("auto_resize", "truncate", "width"))
                 if props.get("auto_resize") is not True and props.get("truncate") is True:
                     l[j] = self._truncate(l[j], props['width'])
-                elif props.get("auto_resize") is True and len(l[j]) > props['width']:
-                    self._set_header_prop(j, "width", len(l[j]))
             if len(l) < len(self.header):
                 l += [""] * (len(self.header) - len(l))
             output += self.__row_template.format(*l)
