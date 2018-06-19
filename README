@@ -1,6 +1,6 @@
 tablify.py - Table String Formatter
 
-Version 0.1.1
+Version 0.1.2
 
 tablify allows users to store a formatted text table in memory and print it.
 
