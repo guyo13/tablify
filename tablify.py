@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from sys import version as PY_VER
 
 if PY_VER[0] == "2":
@@ -113,10 +115,13 @@ class Table(object):
         if ltype not in LINE_TYPES:
             raise ValueError("Line type must be either one of: {}".format(LINE_TYPES))
         if ltype in ITERABLES:
+            line = self._escape(line)
             line = ','.join(str(col) for col in line)
             #line = ','.join(line) # Does not allow lines that come as list/tuple and contain integers for example
-        self.__lines.append(line)
         split = line.split(',')
+        if len(split) > len(self._header):
+            raise ValueError("Line contains more columns than table columns")
+        self.__lines.append(line)
         for i,col in enumerate(split):
             if self._get_header_prop(i, "auto_resize") != True:
                 continue
@@ -174,7 +179,9 @@ class Table(object):
         for i, line in enumerate(self.__lines):
             output += self.__row_spacer
             l = line.split(',')
+            l = self._unescape(l)
             for j, col in enumerate(l):
+                col = self._unescape(col)
                 props = self._get_multiple_header_prop(j, ("auto_resize", "truncate", "width"))
                 if props.get("auto_resize") is not True and props.get("truncate") is True:
                     l[j] = self._truncate(l[j], props['width'])
@@ -185,7 +192,7 @@ class Table(object):
 
     def _get_header_prop(self, index, prop):
         """ Get a property 'prop' from the header element in position 'index' """
-        if index > len(self._header) or index < 0:
+        if index >= len(self._header) or index < 0:
             raise IndexError("Invalid index for get header props")
         prop = self._header[index].get(prop, self.formatter.get(prop))
         return prop
@@ -217,4 +224,58 @@ class Table(object):
         if len(word) > length:
             word = word[0:length]
         return word
+
+    def _escape(self, line):
+        retval = []
+        for col in line:
+            if type(col) in STR_TYPES and ',' in col:
+                col = col.replace(',', '\x1b')
+            retval.append(col)
+        return retval
+    def _unescape(self, line):
+        retval = []
+        for col in line:
+            if type(col) in STR_TYPES and '\x1b' in col:
+                col = col.replace('\x1b', ',')
+            retval.append(col)
+        return retval
+        
+
+if __name__ == "__main__":
+    import sys
+    h = sys.stdin.readline().split()
+    l = 0
+    for col in h:
+        length = len(col)
+        l = length if length > l else l
+    formatter = Formatter(width=l,
+                          text_dir="ltr",
+                          row_delim="-",
+                          column_delim_left="| ",
+                          column_delim_right=" ",
+                          auto_resize=True,
+                          truncate=False
+                        )
+    table = Table(header=h,formatter=formatter)
+    try:
+        thisline = ""
+        for line in iter(sys.stdin.readline, b''):
+            #print(line)
+            #print("hey")
+            line = line.split()
+            if len(line) > len(h):
+                line[len(h)-1] = " ".join(line[len(h)-1:])
+                line = line[0:len(h)]
+            #print(line)
+            thisline = line
+            table.writeline(line)
+    except IndexError:
+        print("ERROR")
+        print(thisline)
+        import traceback
+        print(traceback.format_exc())
+        sys.exit(1)
+    except KeyboardInterrupt:
+        sys.stdout.flush()
+    print(table.stringify())
 
