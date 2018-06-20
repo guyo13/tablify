@@ -260,13 +260,10 @@ if __name__ == "__main__":
     try:
         thisline = ""
         for line in iter(sys.stdin.readline, b''):
-            #print(line)
-            #print("hey")
             line = line.split()
             if len(line) > len(h):
                 line[len(h)-1] = " ".join(line[len(h)-1:])
                 line = line[0:len(h)]
-            #print(line)
             thisline = line
             table.writeline(line)
     except IndexError:
